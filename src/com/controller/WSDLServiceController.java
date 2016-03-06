@@ -51,7 +51,7 @@ public class WSDLServiceController extends HttpServlet {
 		//getServletContext().setAttribute("wsdl", null);
 		getServletContext().setAttribute("method", null);
 		getServletContext().setAttribute("allInputs", null);
-		
+		//request.getSession().setAttribute("wsdlName", "");
 	    request.getRequestDispatcher("/WEB-INF/jsp/WSDLService.jsp").forward(request, response);
 		//SoapOperation op = service.getOperation("myOperation");
 		
@@ -67,6 +67,8 @@ public class WSDLServiceController extends HttpServlet {
 		if (operation.equals(Operations.GetMethods.toString()))
 		{
 			String wsdl = request.getParameter("wsdl");
+			String name = request.getParameter("wsdlName");
+			request.getSession().setAttribute("wsdlName", name);
 			SoapService service = new SoapService(wsdl);	
 			List<SoapOperation> allOps = service.getOperations();
 			getServletContext().setAttribute("allOps", allOps);
@@ -97,7 +99,15 @@ public class WSDLServiceController extends HttpServlet {
 			String inputs []=request.getParameterValues("inputs[]");
 			SoapService service = (SoapService) getServletContext().getAttribute("service");
 			SoapOperation op = service.getOperation(method);
-			
+			String wsdlName = "";
+			if(request.getSession().getAttribute("wsdlName") != "" && request.getSession().getAttribute("wsdlName") != null)
+			{
+				wsdlName = request.getSession().getAttribute("wsdlName").toString();
+			}
+			if(getServletContext().getAttribute("wsdlName") != "" && getServletContext().getAttribute("wsdlName") != null)
+			{
+				wsdlName = getServletContext().getAttribute("wsdlName").toString();
+			}
 			List<SoapOutput> outs = null;
 			List<SoapInput> allInputs = op.getInputs();
 			long timeTaken = 0;
@@ -164,11 +174,13 @@ public class WSDLServiceController extends HttpServlet {
 				 
 				 if(!exist)
 				 {
-					 sql = "INSERT INTO web_services (service_url) VALUES(?)";
+					 sql = "INSERT INTO web_services (service_url,name) VALUES(?,?)";
 					 try {
 						 PreparedStatement pstmt=(PreparedStatement) c.prepareStatement(sql);
 							Statement stmt = c.createStatement();
 							pstmt.setString(1, getServletContext().getAttribute("wsdl").toString());
+							
+								pstmt.setString(2,wsdlName);
 							pstmt.executeUpdate();
 							//System.out.println("inserted");
 							 if(stmt!=null)
@@ -201,7 +213,7 @@ public class WSDLServiceController extends HttpServlet {
 						
 				 }
 				 sql="INSERT INTO web_services_time_consumed(service_id,repetition,time_taken,time_per_request)VALUES('"+id+"','"+request.getParameter("timesToRun")+"','"+timeTaken+"',"+timeTaken/timesToRun+")";
-				 
+				/* System.out.println("servicetime consumed"+sql);*/
 				 try {
 						Statement stmt = c.createStatement();
 						stmt.executeUpdate(sql);
@@ -217,6 +229,64 @@ public class WSDLServiceController extends HttpServlet {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+			String sqlServiceRun = "INSERT INTO `cs594`.`save_webservice_run`(`method`,`time_taken`,`times_run`,`wsdl`)"
+					+ "VALUES('"+method+"',"
+							+ ""+timeTaken/timesToRun+","+timesToRun+","+id+")";
+			/*System.out.println("service rin"+sqlServiceRun);*/
+			Statement statement = null;
+			ResultSet serviceRun;
+			int runId = 0;
+			 try {
+				 c = db.dbConnection();
+			 statement = null;
+			 statement =  c.createStatement();
+			   statement.executeUpdate(sqlServiceRun,Statement.RETURN_GENERATED_KEYS);
+			   serviceRun = statement.getGeneratedKeys();
+			   serviceRun.next();
+			 runId = serviceRun.getInt(1);
+			 if(statement!=null)
+				 statement.close();
+					 
+					if(c!=null)
+						c.close();
+			 }
+			 catch (Exception e)
+			 {
+				 System.out.println(e.getMessage());
+			 }
+			String sqlServiceRunParameters = "";
+			c = db.dbConnection();
+			if(request.getParameterValues("inputs[]") != null)
+			{
+			
+			for(int i =0; i < inputs.length; i++)
+			{
+				sqlServiceRunParameters = "INSERT INTO `cs594`.`service_run_parameters` (`parameter_name`,`parameter_value`,`service_run_id`)"
+						+ "VALUES('"+allInputs.get(i).getName()+"','"+inputs[i]+"','"+runId+"')";
+				try {
+					 statement = null;
+					 statement =  c.createStatement();
+					  statement.executeUpdate(sqlServiceRunParameters);
+					 }
+					 catch (Exception e)
+					 {
+						 System.out.println(e.getMessage());
+					 }
+				// executing the operation
+			}
+			
+			if(statement!=null){
+				 try {
+					statement.close();
+					if(c!=null){
+						c.close();}
+					
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}	 
+			}	
 			
 			request.setAttribute("outs", outs);
 			message = "Time taken to execute this method "+timesToRun+" times is, "+timeTaken+" milli seconds";

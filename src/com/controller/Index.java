@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.configuration.MysqlDB;
+import com.model.WebServiceModel;
 
 /**
  * Servlet implementation class Index
@@ -44,7 +45,7 @@ public class Index extends HttpServlet {
             throw new ServletException( e );
         }
 		Connection c = db.dbConnection();
-		ArrayList<String> lst= new ArrayList<String>();
+		ArrayList<WebServiceModel> lst= new ArrayList<WebServiceModel>();
 		String sql = "select * from web_services";
 		try {
 			Statement stmt = c.createStatement();
@@ -52,7 +53,7 @@ public class Index extends HttpServlet {
 			
 			 while(rs.next())
 			 {
-				 lst.add(rs.getString("service_url"));
+				 lst.add(new WebServiceModel(rs.getInt("id"), rs.getString("service_url"), rs.getString("name")));
 				 
 			 }
 			 
@@ -76,7 +77,11 @@ public class Index extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		String existing = request.getParameter("existing");
+		request.getSession().setAttribute("existing", existing);
 		getServletContext().setAttribute("wsdl", request.getParameter("wsdl").toString());
+		//System.out.println(request.getParameter("name"));
+		request.getSession().setAttribute("wsdlName", request.getParameter("name"));
 		//System.out.println(getServletContext().getAttribute("wsdl"));
 		response.sendRedirect("WSDLServiceController");
 		

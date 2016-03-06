@@ -14,7 +14,7 @@
 	<script>
 		function call()
 		{
-			alert ("jhkjk");
+			/*  alert ("jhkjk");*/
 			$("#myValues").myfunc({divFact:10,eventListenerType:'keyup'});
 			}
 		$(document).ready(function(){

@@ -2,42 +2,17 @@
 <html lang="en">
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <head>
-  <title>Analysis WebService</title>
+  <title>Manage Project</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-  <script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/data.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
-<script>
-$(function () {
-    $('#container').highcharts({
-        data: {
-            table: 'datatable'
-        },
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: 'Data extracted from DataBase for WSDL Services'
-        },
-        yAxis: {
-            allowDecimals: false,
-            title: {
-                text: 'MilliSeconds'
-            }
-        },
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.series.name + '</b><br/>' +
-                    this.point.y + ' ' + this.point.name.toLowerCase();
-            }
-        }
-    });
-});
-</script>
+  <!-- <style type="text/css">
+  	html{
+  	background-image: url('../img/bg-image.jpg');
+  	}
+  </style> -->
 </head>
 <body>
 
@@ -67,31 +42,37 @@ $(function () {
   
  
     <div class="panel panel-default">
-      <div class="panel-heading"> Bar Graph Analysis</div>
+      <div class="panel-heading"> Manage Project</div>
       <div class="panel-body">
-      	<div class="list-group">
-		  <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-		   <div style = "visibility: hidden">
-		   <table id="datatable">
-		    <thead> 
-		    <tr> 
-	            <c:forEach items="${beanGraph}" var="bean">
-	            	
-		            <th><br/></th>
-			    </c:forEach>
-			     </tr>
-		    </thead>
-		    <tbody>
-			    <c:forEach items="${beanGraph}" var="bean">
-			    	<tr>
-			           <th>${bean.wsdlName }</th>
-			            <td>${bean.averageTime }</td>
-			        </tr>
-			    </c:forEach>
-		    </tbody>
+      <c:if test ="${message ne null and message ne ''}">
+      	<div class="alert alert-success">
+  				<c:out value="${message }"></c:out>
+  				<c:set var="message" value="" scope="session"></c:set>
+			</div>
+      </c:if>
+      	<table class="table table-hover">
+						 <thead>
+					      <tr>
+					        <th>WSDL Name</th>
+					        <th>WSDL</th>
+					        <th>Operation</th>
+					      </tr>
+					    </thead>
+		    			<tbody>
+      	<c:forEach items="${lst}" var="l">
+			<tr>
+			<form method = "post" action = "ManageExistingProjectController" class="form-inline">
+			<input type = "hidden" name = "wsdlID" value = "${l.wsdlID}">
+				<td><input type = "text" name = "wsdlName" value ="${l.wsdlName}" class="form-control"></td>
+				<td><input type = "text" name = "wsdlUrl" value ="${l.wsdl}" class="form-control"></td>
+				<td>
+					<input type = "submit" name = "operation" value = "update">
+					<input type = "submit" name = "operation" value = "delete">
+				</td>
+			</form>
+			</tr> 
+		</c:forEach>
 		</table>
-		</div>
-		</div>
       </div>
     </div>
 </div>

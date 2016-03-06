@@ -46,7 +46,7 @@ public class AnalysisWebService extends HttpServlet {
         }
 		Connection c = db.dbConnection();
 		List<AnalysisGraphBean> bean = new ArrayList<AnalysisGraphBean>();
-		String sql = "select a.service_url,avg(b.time_per_request) as time_per_request from web_services a, web_services_time_consumed b where a.id=b.service_id  group by b.service_id;";
+		String sql = "select a.name,avg(b.time_per_request) as time_per_request from web_services a, web_services_time_consumed b where a.id=b.service_id  group by b.service_id;";
 		ResultSet results;
 		Statement stmt = null;
 		try {
@@ -54,7 +54,7 @@ public class AnalysisWebService extends HttpServlet {
 			results = stmt.executeQuery(sql);
 			while(results.next())
 			{
-				bean.add(new AnalysisGraphBean(results.getString("service_url"),results.getInt("time_per_request") ));
+				bean.add(new AnalysisGraphBean(results.getString("name"),results.getInt("time_per_request") ));
 			}
 			
 			

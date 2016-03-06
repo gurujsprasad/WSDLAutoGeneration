@@ -122,4 +122,24 @@
     <servlet-name>AnalysisWebService</servlet-name>
     <url-pattern>/AnalysisWebService</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ViewPreRunController</display-name>
+    <servlet-name>ViewPreRunController</servlet-name>
+    <servlet-class>com.controller.ViewPreRunController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ViewPreRunController</servlet-name>
+    <url-pattern>/ViewPreRunController</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ManageExistingProjectController</display-name>
+    <servlet-name>ManageExistingProjectController</servlet-name>
+    <servlet-class>com.controller.ManageExistingProjectController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ManageExistingProjectController</servlet-name>
+    <url-pattern>/ManageExistingProjectController</url-pattern>
+  </servlet-mapping>
 </web-app>
