@@ -1,0 +1,7 @@
+#not adding class files
+*.class
+
+#neglect war, jar files
+*.jar
+*.ear
+*.war
