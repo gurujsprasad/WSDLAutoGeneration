@@ -5,3 +5,6 @@
 *.jar
 *.ear
 *.war
+
+#ignore text files
+*.jsp
