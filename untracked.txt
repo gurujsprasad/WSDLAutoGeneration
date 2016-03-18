@@ -3,4 +3,8 @@ this file is untracked
 
 modiefues
 
+<<<<<<< HEAD
 version 1
+=======
+this is tag version 2.0
+>>>>>>> branchv2.0
